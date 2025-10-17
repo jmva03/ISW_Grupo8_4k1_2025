@@ -1,7 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy import text
+from sqlalchemy.orm import Session
+from pathlib import Path
 
-engine = create_engine('sqlite:///Actividad.db')
+BASE_DIR = Path(__file__).resolve().parent  # carpeta donde está este script
+DB_PATH = BASE_DIR / "Actividad.db"
+engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
+sesion = Session(engine)
+
+
 
 ddl = """
 CREATE TABLE IF NOT EXISTS actividad (
@@ -45,7 +52,11 @@ INSERT INTO actividad (nombre, requiere_talla, cupos_maximos, edad_minima) VALUE
 -- Agregar columna fecha a TURNO
 ALTER TABLE turno ADD COLUMN fecha TEXT NOT NULL DEFAULT '';
 """
+
+
+"""
 with engine.begin() as connection:
     for stmt in ddl_insertar_datos.split(";"):
         if stmt.strip():
             connection.execute(text(stmt))
+"""
