@@ -19,6 +19,11 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
         validacion_cupos = validar_cupos_disponibles(id_turno, cantidad, db)
         if validacion_cupos["status"] != "ok":
             return validacion_cupos
+            
+        # Validacion de estructura
+        validacion_estructura = validar_participante_estructura(participantes)
+        if validacion_estructura["status"] != "ok":
+            return validacion_estructura
         # Validacion de tyc aceptados
         validacion_tyc = validar_tyc_aceptados(tyc)
         if validacion_tyc["status"] != "ok":
@@ -101,34 +106,8 @@ def validar_participantes_desigual_a_cantidad(cantidad, participantes):
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes no coincide con la cantidad especificada."}
 
-def test_validar_participante_estructura_ok():
-    id_turno = 1
-    cantidad = 2
-    tyc = 1
-    participantes = [
-        {"nombre": "Ana", "dni": "123", "edad": 20, "talla_vestimenta": "S"},
-        {"nombre": "Luis", "dni": "456", "edad": 35, "talla_vestimenta": "L"}
-    ]
-    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
-    assert r["status"] == "ok"
-
-def test_validar_participante_estructura_faltan_datos():
-    id_turno = 1
-    cantidad = 1
-    tyc = 1
-    participantes = [
-        {"nombre": "Ana", "dni": "", "edad": 20, "talla_vestimenta": "S"}, 
-    ]
-    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
-    assert r["status"] == "Faltan datos"
-    assert "Faltan datos" in r["message"]
-
-def test_validar_participante_estructura_sin_edad():
-    id_turno = 1
-    cantidad = 1
-    tyc = 1
-    participantes = [
-        {"nombre": "Ana", "dni": "123", "talla_vestimenta": "M"}  # falta edad
-    ]
-    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
-    assert r["status"] == "Faltan datos"
+def validar_participante_estructura(participantes):
+    for p in participantes:
+        if not p.get("nombre") or not p.get("dni") or p.get("edad") is None:
+            return {"status": "Faltan datos", "message": "Faltan datos de participante (nombre/dni/edad)."}
+    return {"status": "ok"}
