@@ -1,5 +1,6 @@
 from services.inscripcion_actividad import inscribirse_a_actividad
 from services.actividades import listar_disponibilidad
+from fastapi.testclient import TestClient
 
 def test_inscripcion_basica_devuelve_respuesta_exitosa():
     id_turno = 1
@@ -114,3 +115,36 @@ def test_listar_disponibilidad_con_filtro_actividad():
             assert "inicio" in turno
             assert "fin" in turno
             assert "cupos_disponibles" in turno
+
+def test_api_inscripcion_crear_inscripcion():
+
+    client = TestClient(app)
+
+    payload = {
+        "id_turno": 1,
+        "cantidad": 1,
+        "tyc": 1,
+        "participantes": [
+            {"nombre": "Sofia", "dni": "99887766", "edad": 27, "talla_vestimenta": "M"}
+        ]
+    }
+
+    response = client.post("/inscripciones", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["status"] == "ok"
+    assert "datos_reserva" in data
+
+def test_api_disponibilidad_get_disponibilidad():
+
+    client = TestClient(app)
+
+    dia = "2024-12-01"
+    response = client.get(f"/disponibilidad?dia={dia}")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    for actividad in data:
+        assert "actividad_id" in actividad
+        assert "actividad" in actividad
+        assert "turnos" in actividad
