@@ -100,3 +100,35 @@ def validar_participantes_desigual_a_cantidad(cantidad, participantes):
         return {"status": "ok"}
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes no coincide con la cantidad especificada."}
+
+def test_validar_participante_estructura_ok():
+    id_turno = 1
+    cantidad = 2
+    tyc = 1
+    participantes = [
+        {"nombre": "Ana", "dni": "123", "edad": 20, "talla_vestimenta": "S"},
+        {"nombre": "Luis", "dni": "456", "edad": 35, "talla_vestimenta": "L"}
+    ]
+    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert r["status"] == "ok"
+
+def test_validar_participante_estructura_faltan_datos():
+    id_turno = 1
+    cantidad = 1
+    tyc = 1
+    participantes = [
+        {"nombre": "Ana", "dni": "", "edad": 20, "talla_vestimenta": "S"}, 
+    ]
+    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert r["status"] == "Faltan datos"
+    assert "Faltan datos" in r["message"]
+
+def test_validar_participante_estructura_sin_edad():
+    id_turno = 1
+    cantidad = 1
+    tyc = 1
+    participantes = [
+        {"nombre": "Ana", "dni": "123", "talla_vestimenta": "M"}  # falta edad
+    ]
+    r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert r["status"] == "Faltan datos"
