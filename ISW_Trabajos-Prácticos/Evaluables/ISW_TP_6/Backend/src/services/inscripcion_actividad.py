@@ -14,30 +14,30 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
               .filter(Turno.id == id_turno)
               .first()
         )
-        
-        # Validacion de cupos disponibles
+        if not turno:
+            return {"status": "Turno no encontrado", "message": "El turno especificado no existe."}
+
+        # 1) Validaciones con la MISMA sesión
         validacion_cupos = validar_cupos_disponibles(id_turno, cantidad, db)
         if validacion_cupos["status"] != "ok":
             return validacion_cupos
-            
-        # Validacion de estructura
+        
         validacion_estructura = validar_participante_estructura(participantes)
         if validacion_estructura["status"] != "ok":
             return validacion_estructura
-        # Validacion de tyc aceptados
+
         validacion_tyc = validar_tyc_aceptados(tyc)
         if validacion_tyc["status"] != "ok":
             return validacion_tyc
-        
-        # Validacion de cantidad participantes
-        validacion_cantidad = validar_cantidad_participantes(cantidad)
-        if validacion_cantidad["status"] != "ok":
-            return validacion_cantidad
-        
-        # Validacion de cantidad participantes igual a la cantidad
+
         validacion_participantes = validar_participantes_desigual_a_cantidad(cantidad, participantes)
         if validacion_participantes["status"] != "ok":
             return validacion_participantes
+
+        validacion_cantidad = validar_cantidad_participantes(cantidad)
+        if validacion_cantidad["status"] != "ok":
+            return validacion_cantidad
+
         # Importante: vestimenta se valida contra la ACTIVIDAD del turno
         actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
         validacion_vestimenta = validar_vestimenta_requerida(participantes, actividad_id, db)
@@ -66,7 +66,12 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
                 "talla": participante.get("talla_vestimenta"),
             }
             db.add(ReservaParticipante(**data_paticipante))
-        
+
+        # 4) Descontar cupos dentro del mismo lock
+        turno.cupos_disponibles = (turno.cupos_disponibles or 0) - cantidad
+        db.add(turno)
+        # commit lo hace db.begin() al salir
+
         return {"status": "ok", "message": "Inscripción realizada con éxito", "datos_reserva": reserva}
     
 def validar_vestimenta_requerida(participantes, id_actividad, db):
