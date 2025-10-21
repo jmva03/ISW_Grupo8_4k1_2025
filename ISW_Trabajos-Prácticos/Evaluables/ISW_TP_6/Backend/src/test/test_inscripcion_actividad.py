@@ -38,3 +38,11 @@ def test_inscripcion_sin_tyc_aceptados():
     participantes = [{"nombre": "Marta", "dni": "87654321", "edad": 22, "talla_vestimenta": "S"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "No se aceptaron TYC"
+
+def test_inscripcion_sin_cantidad_participantes():
+    id_turno = 1
+    cantidad = 0
+    tyc = 1
+    participantes = []
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "Cantidad inválida"
