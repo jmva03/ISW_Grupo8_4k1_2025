@@ -46,3 +46,11 @@ def test_inscripcion_sin_cantidad_participantes():
     participantes = []
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Cantidad inválida"
+
+def test_inscripcion_participantes_desigual_a_cantidad():
+    id_turno = 7
+    cantidad = 3
+    tyc = 1
+    participantes = [{"nombre": "Carlos", "dni": "11223344", "edad": 29, "talla_vestimenta": "M"}]  # Solo un participante en la lista
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "Cantidad inválida"
