@@ -14,6 +14,11 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
               .filter(Turno.id == id_turno)
               .first()
         )
+        
+        # Validacion de cupos disponibles
+        validacion_cupos = validar_cupos_disponibles(id_turno, cantidad, db)
+        if validacion_cupos["status"] != "ok":
+            return validacion_cupos
 
         # Importante: vestimenta se valida contra la ACTIVIDAD del turno
         actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
@@ -56,3 +61,12 @@ def validar_vestimenta_requerida(participantes, id_actividad, db):
                 return {"status": "Vestimenta requerida",
                         "message": "La actividad requiere especificar la talla de vestimenta para todos los participantes."}
     return {"status": "ok"}
+
+
+def validar_cupos_disponibles(id_turno, cantidad, db):
+    turno = db.query(Turno).filter(Turno.id == id_turno).first()
+    if not turno:
+        return {"status": "Turno no encontrado", "message": "El turno especificado no existe."}
+    if (turno.cupos_disponibles or 0) >= cantidad:
+        return {"status": "ok"}
+    return {"status": "Sin cupos disponibles", "message": "No hay cupos suficientes para la cantidad solicitada."}
