@@ -1,4 +1,5 @@
 from services.inscripcion_actividad import inscribirse_a_actividad
+from services.actividades import listar_disponibilidad
 
 def test_inscripcion_basica_devuelve_respuesta_exitosa():
     id_turno = 1
@@ -86,3 +87,30 @@ def test_validar_participante_estructura_sin_edad():
     ]
     r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert r["status"] == "Faltan datos"
+
+def test_listar_disponibilidad_sin_filtros():
+    dia = "2024-12-01"
+    disponibilidad = listar_disponibilidad(dia=dia)
+    assert isinstance(disponibilidad, list)
+    for actividad in disponibilidad:
+        assert "actividad_id" in actividad
+        assert "actividad" in actividad
+        assert "turnos" in actividad
+        for turno in actividad["turnos"]:
+            assert "id" in turno
+            assert "inicio" in turno
+            assert "fin" in turno
+            assert "cupos_disponibles" in turno
+
+def test_listar_disponibilidad_con_filtro_actividad():
+    dia = "2024-12-01"
+    actividad_id = 1  # Suponiendo que existe una actividad con ID 1
+    disponibilidad = listar_disponibilidad(dia=dia, actividad_id=actividad_id)
+    assert isinstance(disponibilidad, list)
+    for actividad in disponibilidad:
+        assert actividad["actividad_id"] == actividad_id
+        for turno in actividad["turnos"]:
+            assert "id" in turno
+            assert "inicio" in turno
+            assert "fin" in turno
+            assert "cupos_disponibles" in turno
