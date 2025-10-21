@@ -24,3 +24,10 @@ def test_inscripcion_sin_vestimenta_no_requerida():
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "ok"
 
+def test_inscripcion_actividad_sin_cupos():
+    id_turno = 2  # Asumiendo que el turno con ID 2 no tiene cupos disponibles
+    cantidad = 1
+    tyc = 1
+    participantes = [{"nombre": "Ana", "dni": "12345678", "edad": 30, "talla_vestimenta": "L"}]
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "Sin cupos disponibles"
