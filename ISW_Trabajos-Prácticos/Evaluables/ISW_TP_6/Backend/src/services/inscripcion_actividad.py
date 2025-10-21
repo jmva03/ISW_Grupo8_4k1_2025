@@ -23,6 +23,10 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
         validacion_tyc = validar_tyc_aceptados(tyc)
         if validacion_tyc["status"] != "ok":
             return validacion_tyc
+        # Validacion de cantidad participantes
+        validacion_cantidad = validar_cantidad_participantes(cantidad)
+        if validacion_cantidad["status"] != "ok":
+            return validacion_cantidad
 
         # Importante: vestimenta se valida contra la ACTIVIDAD del turno
         actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
@@ -79,3 +83,9 @@ def validar_tyc_aceptados(tyc):
     if (tyc):
         return {"status": "ok"}
     return {"status": "No se aceptaron TYC", "message": "Debe aceptar los términos y condiciones para continuar con la inscripción."}
+
+def validar_cantidad_participantes(cantidad):
+    if cantidad > 0:
+        return {"status": "ok"}
+    else:
+        return {"status": "Cantidad inválida", "message": "La cantidad de participantes debe ser mayor a cero."}
