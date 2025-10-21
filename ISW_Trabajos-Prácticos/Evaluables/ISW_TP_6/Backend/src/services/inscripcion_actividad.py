@@ -1,6 +1,6 @@
 from database.db import sesion
 from datetime import datetime
-from database.schemas import Reserva, Turno, ReservaParticipante
+from database.schemas import Reserva, Turno, ReservaParticipante, Actividad
 import json
 
 
@@ -14,7 +14,13 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
               .filter(Turno.id == id_turno)
               .first()
         )
-             
+
+        # Importante: vestimenta se valida contra la ACTIVIDAD del turno
+        actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
+        validacion_vestimenta = validar_vestimenta_requerida(participantes, actividad_id, db)
+        if validacion_vestimenta["status"] != "ok":
+            return validacion_vestimenta
+
         # 2) Crear reserva
         reserva = {
             "turno_id": id_turno,
@@ -39,3 +45,14 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
             db.add(ReservaParticipante(**data_paticipante))
         
         return {"status": "ok", "message": "Inscripción realizada con éxito", "datos_reserva": reserva}
+    
+def validar_vestimenta_requerida(participantes, id_actividad, db):
+    if not id_actividad:
+        return {"status": "ok"}
+    actividad = db.query(Actividad).filter(Actividad.id == id_actividad).first()
+    if actividad and actividad.requiere_talla:
+        for p in participantes:
+            if not p.get("talla_vestimenta"):
+                return {"status": "Vestimenta requerida",
+                        "message": "La actividad requiere especificar la talla de vestimenta para todos los participantes."}
+    return {"status": "ok"}
