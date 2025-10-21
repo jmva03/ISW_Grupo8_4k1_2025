@@ -31,7 +31,6 @@ def test_inscripcion_actividad_sin_cupos():
     participantes = [{"nombre": "Ana", "dni": "12345678", "edad": 30, "talla_vestimenta": "L"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Sin cupos disponibles"
-    
 def test_inscripcion_sin_tyc_aceptados():
     id_turno = 1
     cantidad = 1

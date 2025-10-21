@@ -19,6 +19,10 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
         validacion_cupos = validar_cupos_disponibles(id_turno, cantidad, db)
         if validacion_cupos["status"] != "ok":
             return validacion_cupos
+        # Validacion de tyc aceptados
+        validacion_tyc = validar_tyc_aceptados(tyc)
+        if validacion_tyc["status"] != "ok":
+            return validacion_tyc
 
         # Importante: vestimenta se valida contra la ACTIVIDAD del turno
         actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
@@ -70,3 +74,8 @@ def validar_cupos_disponibles(id_turno, cantidad, db):
     if (turno.cupos_disponibles or 0) >= cantidad:
         return {"status": "ok"}
     return {"status": "Sin cupos disponibles", "message": "No hay cupos suficientes para la cantidad solicitada."}
+
+def validar_tyc_aceptados(tyc):
+    if (tyc):
+        return {"status": "ok"}
+    return {"status": "No se aceptaron TYC", "message": "Debe aceptar los términos y condiciones para continuar con la inscripción."}
