@@ -1,0 +1,26 @@
+from services.inscripcion_actividad import inscribirse_a_actividad
+
+def test_inscripcion_basica_devuelve_respuesta_exitosa():
+    id_turno = 1
+    cantidad = 1
+    tyc = 1
+    participantes = [{"nombre": "Juan", "edad": 25, "talla_camisa": "M", "dni": "12345678"}]
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "ok"
+
+def test_inscripcion_sin_vestimenta_requerida():
+    id_turno = 7
+    cantidad = 2
+    tyc = 1
+    participantes = [{"nombre": "Juan","dni": "4568786", "edad": 25, "talla_vestimenta": "S"}, {'nombre': 'Pedro', 'dni': '12345678', 'edad': 30}]
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "Vestimenta requerida"
+
+def test_inscripcion_sin_vestimenta_no_requerida():
+    id_turno = 4
+    cantidad = 1
+    tyc = 1
+    participantes = [{"nombre": "Luis", "dni": "98765432", "edad": 28}]
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "ok"
+

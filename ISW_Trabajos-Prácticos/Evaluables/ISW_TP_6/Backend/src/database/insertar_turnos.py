@@ -1,10 +1,20 @@
 from datetime import date, datetime, time, timedelta
 from sqlalchemy import create_engine, text
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent  # carpeta donde está este script
+DB_PATH = BASE_DIR / "Actividad.db"
+engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
 
-engine = create_engine('sqlite:///Actividad.db', echo=False)
 
+
+# --- Generación de turnos (sin duplicar) ---
 with engine.begin() as conn:
     # Traer actividades (id y cupos máximos)
+    conn.execute(text("DELETE FROM turno"))
+    conn.execute(text("Delete from reserva_participante;"))  # limpiar tu
+    conn.execute(text("DELETE FROM sqlite_sequence WHERE name='turno';"))  
+    conn.execute(text("Delete from reserva"))  #
+                      
     actividades = conn.execute(
         text("SELECT id, cupos_maximos FROM actividad")
     ).fetchall()
@@ -59,4 +69,5 @@ with engine.begin() as conn:
                     )
 
             dt = dt_end
-print("✅ Turnos generados (sin duplicar).")
+
+print("✅ BD creada/sembrada y turnos generados (sin duplicar).")
