@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 from services.inscripcion_actividad import inscribirse_a_actividad
 from services. actividades import listar_disponibilidad
@@ -9,17 +8,10 @@ from src.main import app
 
 import sys
 print("PYTHONPATH:\n", "\n".join(sys.path[:5]))
-=======
-from services.inscripcion_actividad import inscribirse_a_actividad
-from services.actividades import listar_disponibilidad
-from fastapi.testclient import TestClient
-
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_inscripcion_basica_devuelve_respuesta_exitosa():
     id_turno = 1
     cantidad = 1
     tyc = 1
-<<<<<<< HEAD
     participantes = [{"nombre": "Eugenio", "dni": "4568786", "edad": 25, "talla_vestimenta": "M"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
 
@@ -27,12 +19,6 @@ def test_inscripcion_basica_devuelve_respuesta_exitosa():
     assert respuesta["status"] == "ok"
 
 
-=======
-    participantes = [{"nombre": "Juan", "edad": 25, "talla_vestimenta": "M", "dni": "12345678"}]
-    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
-    assert respuesta["status"] == "ok"
-
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_inscripcion_sin_vestimenta_requerida():
     id_turno = 7
     cantidad = 2
@@ -56,10 +42,7 @@ def test_inscripcion_actividad_sin_cupos():
     participantes = [{"nombre": "Ana", "dni": "12345678", "edad": 30, "talla_vestimenta": "L"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Sin cupos disponibles"
-<<<<<<< HEAD
-
-=======
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
+    
 def test_inscripcion_sin_tyc_aceptados():
     id_turno = 1
     cantidad = 1
@@ -84,17 +67,13 @@ def test_inscripcion_participantes_desigual_a_cantidad():
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Cantidad inválida"
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_validar_participante_estructura_ok():
     id_turno = 1
     cantidad = 2
     tyc = 1
     participantes = [
-        {"nombre": "Ana", "dni": "123", "edad": 20, "talla_vestimenta": "S"},
-        {"nombre": "Luis", "dni": "456", "edad": 35, "talla_vestimenta": "L"}
+        {"nombre": "Ana", "dni": "1232342", "edad": 20, "talla_vestimenta": "S"},
+        {"nombre": "Luis", "dni": "4563432", "edad": 35, "talla_vestimenta": "L"}
     ]
     r = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert r["status"] == "ok"
@@ -179,3 +158,59 @@ def test_api_disponibilidad_get_disponibilidad():
         assert "actividad_id" in actividad
         assert "actividad" in actividad
         assert "turnos" in actividad
+
+def test_inscripcion_falla_por_formato_dni_o_nombre():
+    id_turno = 1
+    cantidad = 1
+    tyc = 1
+
+    # --- Caso 1: DNI con letras (debe fallar) ---
+    participantes_dni_letras = [{"nombre": "Alice", "dni": "1234567A", "edad": 25, "talla_vestimenta": "M"}]
+    respuesta_dni_letras = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes_dni_letras)
+    assert respuesta_dni_letras["status"] == "error"
+    assert "solo números" in respuesta_dni_letras["message"]
+
+    # --- Caso 2: DNI con longitud incorrecta (6 dígitos, debe fallar) ---
+    participantes_dni_corto = [{"nombre": "Bob", "dni": "123456", "edad": 30, "talla_vestimenta": "L"}]
+    respuesta_dni_corto = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes_dni_corto)
+    assert respuesta_dni_corto["status"] == "error"
+    assert "entre 7 y 8 dígitos" in respuesta_dni_corto["message"]
+
+    # --- Caso 3: Nombre con números (debe fallar) ---
+    participantes_nombre_numeros = [{"nombre": "Cloe123", "dni": "88776655", "edad": 22, "talla_vestimenta": "S"}]
+    respuesta_nombre_numeros = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes_nombre_numeros)
+    assert respuesta_nombre_numeros["status"] == "error"
+    assert "no puede contener números" in respuesta_nombre_numeros["message"]
+
+    # --- Caso 4: Nombre muy corto (1 caracter, debe fallar) ---
+    participantes_nombre_corto = [{"nombre": "D", "dni": "12345678", "edad": 40, "talla_vestimenta": "XL"}]
+    respuesta_nombre_corto = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes_nombre_corto)
+    assert respuesta_nombre_corto["status"] == "error"
+
+def test_inscripcion_falla_por_edad_minima_no_cumplida():
+    id_turno = 5
+    cantidad = 2
+    tyc = 1
+    
+    participantes = [
+        {"nombre": "Adulto OK", "dni": "11223344", "edad": 0, "talla_vestimenta": "M"}, 
+        {"nombre": "Menor No OK", "dni": "55667788", "edad": 15, "talla_vestimenta": "S"}
+    ]
+    
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    
+    assert respuesta["status"] == "Edad mínima no cumplida"
+    assert "no cumple con la edad mínima requerida" in respuesta["message"]
+
+def test_inscripcion_exitosa_si_cumplen_edad_minima():
+    id_turno = 4 
+    cantidad = 1
+    tyc = 1
+    
+    participantes = [
+        {"nombre": "Juan Adulto", "dni": "99001122", "edad": 20, "talla_vestimenta": "L"}
+    ]
+    
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    
+    assert respuesta["status"] == "ok"

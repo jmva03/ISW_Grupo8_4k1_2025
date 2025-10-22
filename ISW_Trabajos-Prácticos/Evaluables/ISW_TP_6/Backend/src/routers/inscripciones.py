@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.post("/inscripciones", response_model=InscripcionOut, status_code=status.HTTP_201_CREATED)
 def crear_inscripcion(payload: InscripcionIn):
-<<<<<<< HEAD
     # Llamamos a tu servicio tal cual
     r = inscribirse_a_actividad(
         id_turno=payload.id_turno,
@@ -34,11 +33,9 @@ def crear_inscripcion(payload: InscripcionIn):
     if s == "Sin cupos disponibles":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=r)
 
-    if s == "Faltan datos":
+    if s in ["Faltan datos", "error", "Vestimenta requerida", "Edad mínima no cumplida"]: 
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=r)
-
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=r)
-
+    
 
 @router.get("/disponibilidad", response_model=List[ActividadDisponibilidadOut])
 def get_disponibilidad(
@@ -50,10 +47,3 @@ def get_disponibilidad(
     Si se pasa 'actividad_id', limita la respuesta a esa actividad.
     """
     return listar_disponibilidad(dia=dia, actividad_id=actividad_id)
-=======
-     pass
-
-@router.get("/disponibilidad", response_model=List[ActividadDisponibilidadOut])
-def get_disponibilidad():
-     pass
->>>>>>> e8827b573e34ae6b8615a32895804368105df986

@@ -1,12 +1,8 @@
 from database.db import sesion
 from datetime import datetime
-<<<<<<< HEAD
 from database.schemas import Reserva, Actividad, ReservaParticipante, Turno
-=======
-from database.schemas import Reserva, Turno, ReservaParticipante, Actividad
-import json
-
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
+from typing import List, Dict, Any
+import re
 
 def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
     # Abrimos UNA sola sesión + transacción atómica
@@ -30,6 +26,11 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
         if validacion_estructura["status"] != "ok":
             return validacion_estructura
 
+        #Validamos el tipo de dato
+        validacion_formato = validar_formato_participantes(participantes)
+        if validacion_formato["status"] != "ok":
+            return validacion_formato
+        
         validacion_tyc = validar_tyc_aceptados(tyc)
         if validacion_tyc["status"] != "ok":
             return validacion_tyc
@@ -42,6 +43,9 @@ def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
         if validacion_cantidad["status"] != "ok":
             return validacion_cantidad
 
+        validacion_edad = validar_edad_minima(turno, participantes)
+        if validacion_edad["status"] != "ok":
+            return validacion_edad
         # Importante: vestimenta se valida contra la ACTIVIDAD del turno
         actividad_id = getattr(turno, "actividad_id", None) or getattr(getattr(turno, "actividad", None), "id", None)
         validacion_vestimenta = validar_vestimenta_requerida(participantes, actividad_id, db)
@@ -89,10 +93,6 @@ def validar_vestimenta_requerida(participantes, id_actividad, db):
                         "message": "La actividad requiere especificar la talla de vestimenta para todos los participantes."}
     return {"status": "ok"}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_cupos_disponibles(id_turno, cantidad, db):
     turno = db.query(Turno).filter(Turno.id == id_turno).first()
     if not turno:
@@ -111,23 +111,77 @@ def validar_cantidad_participantes(cantidad):
         return {"status": "ok"}
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes debe ser mayor a cero."}
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_participantes_desigual_a_cantidad(cantidad, participantes):
     if cantidad == len(participantes):
         return {"status": "ok"}
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes no coincide con la cantidad especificada."}
-<<<<<<< HEAD
     
-=======
-
->>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_participante_estructura(participantes):
     for p in participantes:
         if not p.get("nombre") or not p.get("dni") or p.get("edad") is None:
             return {"status": "Faltan datos", "message": "Faltan datos de participante (nombre/dni/edad)."}
     return {"status": "ok"}
+
+def validar_formato_participantes(participantes: List[Dict[str, Any]]) -> Dict[str, str]:
+    """
+    Valida el formato de DNI y nombre de los participantes.
+
+    Reglas:
+    - DNI: Solo números, entre 7 y 8 dígitos.
+    - Nombre: No debe contener números, más de 1 caracter (se permiten letras y espacios).
+    """
+    for i, participante in enumerate(participantes):
+        dni = participante.get("dni", "")
+        nombre = participante.get("nombre", "")
+
+        # --- Validación de DNI ---
+        # 1. Verificar si son solo dígitos
+        if not dni.isdigit():
+            return {
+                "status": "error",
+                "message": f"DNI del participante {i+1} ('{dni}') debe contener solo números."
+            }
+        # 2. Verificar longitud
+        if not (7 <= len(dni) <= 8):
+            return {
+                "status": "error",
+                "message": f"DNI del participante {i+1} ('{dni}') debe tener entre 7 y 8 dígitos."
+            }
+
+        # --- Validación de Nombre ---
+        # 1. Verificar longitud
+        if len(nombre.strip()) <= 1:
+            return {
+                "status": "error",
+                "message": f"Nombre del participante {i+1} ('{nombre}') debe tener más de un caracter."
+            }
+        # 2. Verificar que no contenga números (solo letras y espacios)
+        # re.search busca cualquier dígito (0-9) en el nombre
+        if re.search(r'\d', nombre):
+            return {
+                "status": "error",
+                "message": f"Nombre del participante {i+1} ('{nombre}') no puede contener números."
+            }
+            
+    return {"status": "ok", "message": "Formatos de participantes válidos."}
+
+def validar_edad_minima(turno: Any, participantes: List[Dict[str, Any]]) -> Dict[str, str]:
+
+    edad_minima = getattr(getattr(turno, "actividad", None), "edad_minima", 0) or 0
+    
+    if edad_minima <= 0:
+        return {"status": "ok", "message": "No hay restricción de edad mínima."}
+
+    
+    for i, participante in enumerate(participantes):
+        edad_participante = participante.get("edad")
+        if edad_participante < edad_minima:
+            return {
+                "status": "Edad mínima no cumplida",
+                "message": (
+                    f"El participante {i+1} ('{participante.get('nombre', 'Sin Nombre')}', {edad_participante} años) "
+                    f"no cumple con la edad mínima requerida de {edad_minima} años para esta actividad."
+                )
+            }
+    return {"status": "ok", "message": "Todos los participantes cumplen con la edad mínima."}
