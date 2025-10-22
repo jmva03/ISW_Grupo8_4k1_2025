@@ -9,6 +9,7 @@ engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
 
 # --- Generación de turnos (sin duplicar) ---
 with engine.begin() as conn:
+    
     # Traer actividades (id y cupos máximos)
     conn.execute(text("DELETE FROM turno"))
     conn.execute(text("Delete from reserva_participante;"))  # limpiar tu
