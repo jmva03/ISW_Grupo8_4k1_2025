@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 from services.inscripcion_actividad import inscribirse_a_actividad
 from services. actividades import listar_disponibilidad
@@ -8,10 +9,17 @@ from src.main import app
 
 import sys
 print("PYTHONPATH:\n", "\n".join(sys.path[:5]))
+=======
+from services.inscripcion_actividad import inscribirse_a_actividad
+from services.actividades import listar_disponibilidad
+from fastapi.testclient import TestClient
+
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_inscripcion_basica_devuelve_respuesta_exitosa():
     id_turno = 1
     cantidad = 1
     tyc = 1
+<<<<<<< HEAD
     participantes = [{"nombre": "Eugenio", "dni": "4568786", "edad": 25, "talla_vestimenta": "M"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
 
@@ -19,6 +27,12 @@ def test_inscripcion_basica_devuelve_respuesta_exitosa():
     assert respuesta["status"] == "ok"
 
 
+=======
+    participantes = [{"nombre": "Juan", "edad": 25, "talla_vestimenta": "M", "dni": "12345678"}]
+    respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
+    assert respuesta["status"] == "ok"
+
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_inscripcion_sin_vestimenta_requerida():
     id_turno = 7
     cantidad = 2
@@ -42,7 +56,10 @@ def test_inscripcion_actividad_sin_cupos():
     participantes = [{"nombre": "Ana", "dni": "12345678", "edad": 30, "talla_vestimenta": "L"}]
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Sin cupos disponibles"
+<<<<<<< HEAD
 
+=======
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_inscripcion_sin_tyc_aceptados():
     id_turno = 1
     cantidad = 1
@@ -67,7 +84,10 @@ def test_inscripcion_participantes_desigual_a_cantidad():
     respuesta = inscribirse_a_actividad(id_turno, cantidad, tyc, participantes)
     assert respuesta["status"] == "Cantidad inválida"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def test_validar_participante_estructura_ok():
     id_turno = 1
     cantidad = 2

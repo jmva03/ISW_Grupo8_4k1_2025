@@ -1,6 +1,12 @@
 from database.db import sesion
 from datetime import datetime
+<<<<<<< HEAD
 from database.schemas import Reserva, Actividad, ReservaParticipante, Turno
+=======
+from database.schemas import Reserva, Turno, ReservaParticipante, Actividad
+import json
+
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 
 def inscribirse_a_actividad(id_turno, cantidad, tyc, participantes):
     # Abrimos UNA sola sesión + transacción atómica
@@ -83,6 +89,10 @@ def validar_vestimenta_requerida(participantes, id_actividad, db):
                         "message": "La actividad requiere especificar la talla de vestimenta para todos los participantes."}
     return {"status": "ok"}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_cupos_disponibles(id_turno, cantidad, db):
     turno = db.query(Turno).filter(Turno.id == id_turno).first()
     if not turno:
@@ -101,13 +111,21 @@ def validar_cantidad_participantes(cantidad):
         return {"status": "ok"}
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes debe ser mayor a cero."}
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_participantes_desigual_a_cantidad(cantidad, participantes):
     if cantidad == len(participantes):
         return {"status": "ok"}
     else:
         return {"status": "Cantidad inválida", "message": "La cantidad de participantes no coincide con la cantidad especificada."}
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> e8827b573e34ae6b8615a32895804368105df986
 def validar_participante_estructura(participantes):
     for p in participantes:
         if not p.get("nombre") or not p.get("dni") or p.get("edad") is None:
