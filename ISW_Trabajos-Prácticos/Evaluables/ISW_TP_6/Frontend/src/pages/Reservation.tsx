@@ -352,7 +352,30 @@ const handleSubmit = async (e: React.FormEvent) => {
       console.warn("Form is invalid, submission blocked.")
       return
     }
+    // -----------------------------------------------------------------
+    // 💥 INICIO DE LA SOLUCIÓN SENCILLA Y CASERA (VALIDACIÓN DE DNI DUPLICADOS)
+    // -----------------------------------------------------------------
+    const dnis = participants.map(p => p.dni.trim()).filter(dni => dni !== "");
+    const uniqueDnis = new Set(dnis);
 
+    if (dnis.length !== uniqueDnis.size) {
+      const duplicateDnis = dnis.filter((dni, index) => dnis.indexOf(dni) !== index);
+      const uniqueDuplicates = [...new Set(duplicateDnis)];
+      
+      const errorMessage = `No puede haber dos participantes con el mismo DNI. DNI(s) duplicado(s): ${uniqueDuplicates.join(', ')}.`;
+      
+      setSubmitError(errorMessage);
+      toast.error("Error de Datos", {
+        description: errorMessage,
+        position: "top-center",
+        duration: 5000 // Deja el mensaje visible un poco más
+      });
+      setIsSubmitting(false); // Detenemos el envío
+      return; // Salimos de la función sin enviar la petición
+    }
+    // -----------------------------------------------------------------
+    // 💥 FIN DE LA SOLUCIÓN
+    // -----------------------------------------------------------------
     setIsSubmitting(true)
     setSubmitError(null)
 
