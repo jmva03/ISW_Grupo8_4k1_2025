@@ -2,7 +2,7 @@ export interface DataResponse {
   actividad_id: number
   actividad: string
   requiere_talla: number
-  edad_minima: null
+  edad_minima?: number
   turnos: Turno[]
 }
 
