@@ -18,7 +18,16 @@ import {
  AccordionItem,
  AccordionTrigger,
 } from "@/components/ui/accordion"
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
 export interface DataResponse {
   actividad_id: number
   actividad: string
@@ -66,6 +75,9 @@ export function ActivityRegistrationForm() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [minAgeForActivity, setMinAgeForActivity] = useState<number | null>(null)
+  const [clientErrors, setClientErrors] = useState<Record<number, { dni?: string; name?: string; age?: string }>>({});
+
   const [currentFormStep, setCurrentFormStep] = useState("step-1")
   const requiresClothingSize = selectedActivity ? activityConfig[selectedActivity].requiere_talla === 1 : false
 
@@ -91,7 +103,40 @@ export function ActivityRegistrationForm() {
       setTermsAccepted(false)
       setSubmitError(null)
       setCurrentFormStep("step-1")
+      setMinAgeForActivity(null) // <-- AÑADIR
+      setClientErrors({}) // <-- AÑADIR
     }
+
+// --- FUNCIONES DE VALIDACIÓN (PASO 3A, 3B, 3C) ---
+  
+  const validateName = (name: string): string | null => {
+    if (/\d/.test(name)) { // Regex para buscar cualquier dígito
+      return "El nombre no puede contener números."
+    }
+    return null
+  }
+
+  const validateDNI = (dni: string): string | null => {
+    if (!/^\d+$/.test(dni)) { // Regex para solo números
+      return "El DNI debe contener solo números."
+    }
+    if (dni.length < 7 || dni.length > 8) {
+      return "El DNI debe tener entre 7 y 8 dígitos."
+    }
+    return null
+  }
+
+  const validateAge = (age: string, minAge: number | null): string | null => {
+    const ageNum = Number.parseInt(age, 10)
+    if (isNaN(ageNum) || ageNum <= 0) {
+      return "Edad inválida."
+    }
+    if (minAge && ageNum < minAge) {
+      return `La edad mínima para esta actividad es ${minAge} años.`
+    }
+    return null
+  }
+
 
   const isDateDisabled = (date: Date) => {
     const today = new Date()
@@ -166,7 +211,7 @@ useEffect(() => {
       // Si llegamos aquí, dataResponse[0] SÍ existe
       const data: DataResponse = dataResponse[0] 
       console.log("[v0] Received time slots:", data)
-
+      setMinAgeForActivity(data.edad_minima || null)
       const availableSlots = data.turnos ? data.turnos.filter((turno) => turno.cupos_disponibles > 0) : []
 
       if (availableSlots.length === 0) {
@@ -199,14 +244,24 @@ useEffect(() => {
   }, [selectedDate, selectedActivity])
 
   useEffect(() => {
-    const count = Number.parseInt(numberOfParticipants) || 1
+    let count = Number.parseInt(numberOfParticipants, 10);
+ 
+    // 2. Validamos que sea un número válido y mayor a 0
+    if (isNaN(count) || count < 1) {
+      count = 1;
+    }
+ 
+    // 3. (Opcional pero recomendado) Validamos contra el máximo
+    if (maxParticipants && count > maxParticipants) {
+      count = maxParticipants;
+    }
     setParticipants((prev) => {
       const newParticipants = Array.from({ length: count }, (_, i) => {
         return prev[i] || { fullName: "", dni: "", age: "", clothingSize: "" }
       })
       return newParticipants
     })
-  }, [numberOfParticipants])
+  }, [numberOfParticipants, maxParticipants])
 
   useEffect(() => {
       const currentCount = Number.parseInt(numberOfParticipants)
@@ -218,33 +273,75 @@ useEffect(() => {
     }, [maxParticipants, numberOfParticipants])
 
 
-  const updateParticipant = (index: number, field: keyof ParticipantDetails, value: string) => {
+const updateParticipant = (index: number, field: keyof ParticipantDetails, value: string) => {
+    // 1. Actualiza el estado del participante (esto está bien)
     setParticipants((prev) => {
       const updated = [...prev]
       updated[index] = { ...updated[index], [field]: value }
       return updated
     })
+
+    // 2. Ejecuta la validación y actualiza el estado de errores (AQUÍ LA CORRECCIÓN)
+    setClientErrors((prevErrors) => {
+      // Copia los errores específicos de ESTE participante
+      const newErrors = { ...prevErrors[index] }
+      let error: string | null = null
+      let fieldName: "name" | "dni" | "age" | undefined; // Necesitamos saber qué campo es
+
+      if (field === "fullName") {
+        fieldName = "name"
+        error = validateName(value)
+      } else if (field === "dni") {
+        fieldName = "dni"
+        error = validateDNI(value)
+      } else if (field === "age") {
+        fieldName = "age"
+        error = validateAge(value, minAgeForActivity)
+      }
+
+      // Si es un campo que validamos...
+      if (fieldName) {
+        if (error) {
+          // Si hay un error, lo establecemos
+          newErrors[fieldName] = error
+        } else {
+          // Si NO hay error, ELIMINAMOS la clave
+          delete newErrors[fieldName]
+        }
+      }
+
+      // Devolvemos el estado de errores actualizado
+      return {
+        ...prevErrors,
+        [index]: newErrors,
+      }
+    })
   }
-
-  const isFormValid = () => {
-    if (!selectedDate || !selectedActivity || !selectedTimeSlot || !termsAccepted) return false
-
-    const currentCount = Number.parseInt(numberOfParticipants) || 0
-    if (currentCount <= 0) return false // No puede ser 0
-    if (maxParticipants && currentCount > maxParticipants) {
-      // Doble chequeo por si el estado no se actualizó a tiempo
+const isFormValid = () => {
+    if (!selectedDate || !selectedActivity || !selectedTimeSlot || !termsAccepted) {
       return false
     }
 
+    const count = Number.parseInt(numberOfParticipants, 10)
+    if (isNaN(count) || count < 1) {
+      return false // Deshabilita el botón si es 0, NaN, o < 1
+    }
 
+    const hasClientErrors = Object.values(clientErrors).some(
+      (participantErrors) => Object.keys(participantErrors).length > 0,
+    )
+    if (hasClientErrors) {
+      return false
+    }
+
+    // 3. Comprueba que todos los campos estén llenos (como antes)
     return participants.every((participant) => {
       const basicFieldsFilled =
         participant.fullName.trim() !== "" && participant.dni.trim() !== "" && participant.age.trim() !== ""
 
       if (requiresClothingSize) {
-        return basicFieldsFilled && participant.clothingSize !== ""
+        return basicFieldsFilled && !!participant.clothingSize
       }
-
       return basicFieldsFilled
     })
   }
@@ -288,8 +385,20 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       if (!response.ok) {
         // Intenta leer un mensaje de error del backend
-        const errorData = await response.json().catch(() => ({}))
-        const errorMessage = errorData.detail || "Failed to submit reservation. Please check your data."
+        const errorData = await response.json().catch(() => ({})); // Intenta parsear el JSON
+        let errorMessage = "No se pudo realizar la inscripción. Intenta de nuevo."
+      
+        // Comprueba si viene el formato {"detail": {"status": "...", "message": "..."}}
+        if (errorData.detail && errorData.detail.message) {
+          errorMessage = errorData.detail.message;
+        }
+        // Comprueba si viene un error simple {"detail": "..."}
+        else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        }        
+        
+        
+        
         throw new Error(errorMessage)
       }
 
@@ -304,7 +413,10 @@ const handleSubmit = async (e: React.FormEvent) => {
       console.error("[v0] Error submitting reservation:", error)
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during submission."
       setSubmitError(errorMessage)
-      toast.error(errorMessage)
+      toast.error("Error en la Inscripción", {
+        description: errorMessage,
+        position: "top-center",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -324,6 +436,23 @@ const handleSubmit = async (e: React.FormEvent) => {
         <Skeleton className="h-5 w-2/3" />
       </div>
     )
+// ... (después de tus funciones de validación)
+
+  const handleParticipantsBlur = () => {
+    let count = Number.parseInt(numberOfParticipants, 10);
+
+    // Si no es un número o es menor a 1...
+    if (isNaN(count) || count < 1) {
+      // ...lo reseteamos a "1".
+      setNumberOfParticipants("1");
+    }
+    // Si excede el máximo...
+    else if (maxParticipants && count > maxParticipants) {
+      // ...lo reseteamos al máximo.
+      setNumberOfParticipants(maxParticipants.toString());
+    }
+  };
+
 
   return (
     <Card className="w-full">
@@ -352,6 +481,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                 setNumberOfParticipants("1")
                 setParticipants([{ fullName: "", dni: "", age: "", clothingSize: "" }])
                 setTermsAccepted(false)
+                setMinAgeForActivity(null) // <-- AÑADIR
+                setClientErrors({}) // <-- AÑADIR
 
                 // 3. Mueve el acordeón al Paso 1 (Actividad)
                 // (O al paso 2 si quieres que salte directo a turnos, 
@@ -453,7 +584,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                               )}
                             >
                               <span className="font-bold text-lg">{turno.inicio}</span>
-                              <span className="text-xs text-muted-foreground">{turno.cupos_disponibles} cupos</span>
+                              <span className="text-xs text-center text-muted-foreground uppercase">
+                                Quedan {turno.cupos_disponibles} cupos
+                              </span>
+
                             </Label>
                           </div>
                         ))}
@@ -484,6 +618,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={numberOfParticipants}
                     onChange={(e) => setNumberOfParticipants(e.target.value)}
                     disabled={!maxParticipants}
+                    onBlur={handleParticipantsBlur}
                   />
                 </div>
 
@@ -501,7 +636,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                             <h4 className="font-medium text-muted-foreground">Participante {index + 1}</h4>
 
                             {/* Nombre Completo */}
-                            <div className="space-y-2">
+                              <div className="space-y-2">
                               <Label htmlFor={`fullName-${index}`}>Nombre Completo</Label>
                               <Input
                                 id={`fullName-${index}`}
@@ -509,6 +644,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 onChange={(e) => updateParticipant(index, "fullName", e.target.value)}
                                 placeholder="Ingresa el nombre"
                               />
+                              {/* --- MOSTRAR ERROR DE CLIENTE --- */}
+                              {clientErrors[index]?.name && (
+                                <p className="text-sm text-destructive">{clientErrors[index].name}</p>
+                              )}
                             </div>
 
                             {/* DNI */}
@@ -520,6 +659,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 onChange={(e) => updateParticipant(index, "dni", e.target.value)}
                                 placeholder="Ingresa el DNI"
                               />
+                              {/* --- MOSTRAR ERROR DE CLIENTE --- */}
+                              {clientErrors[index]?.dni && (
+                                <p className="text-sm text-destructive">{clientErrors[index].dni}</p>
+                              )}
                             </div>
 
                             {/* Edad */}
@@ -534,6 +677,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 onChange={(e) => updateParticipant(index, "age", e.target.value)}
                                 placeholder="Ingresa la edad"
                               />
+                              {/* --- MOSTRAR ERROR DE CLIENTE --- */}
+                              {clientErrors[index]?.age && (
+                                <p className="text-sm text-destructive">{clientErrors[index].age}</p>
+                              )}
                             </div>
 
                             {/* Talle (Condicional) */}
@@ -563,17 +710,66 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
 
                     {/* 2B. TÉRMINOS Y CONDICIONES */}
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="terms"
-                        checked={termsAccepted}
-                        onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                      />
-                      <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
-                        Acepto los términos y condiciones de la actividad{" "}
-                        <span className="font-semibold">{selectedActivity}</span>.
-                      </Label>
-                    </div>
+{/* 2B. TÉRMINOS Y CONDICIONES (CON MODAL) */}
+                    <Dialog>
+                      <div className="flex items-start space-x-2">
+                        <Checkbox
+                          id="terms"
+                          checked={termsAccepted}
+                          onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                        />
+                        <div className="grid gap-1.5 leading-relaxed">
+                          <Label htmlFor="terms" className="text-sm">
+                            Acepto los{" "}
+                            <DialogTrigger asChild>
+                              <span className="text-primary font-semibold underline cursor-pointer hover:text-eco-dark">
+                                términos y condiciones
+                              </span>
+                            </DialogTrigger>
+                            {" "}de la actividad {" "}
+                            <span className="font-semibold">{selectedActivity}</span>.
+                          </Label>
+                        </div>
+                      </div>
+
+                      {/* CONTENIDO DEL MODAL */}
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Términos y Condiciones - EcoHarmony Park</DialogTitle>
+                          <DialogDescription>
+                            Al inscribirse, el visitante declara haber leído y aceptado los siguientes términos:
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 text-sm text-muted-foreground max-h-[400px] overflow-y-auto pr-4">
+                          <p>
+                            <strong>Responsabilidad personal:</strong> El participante asume la responsabilidad por su estado físico y condiciones de salud necesarias para realizar la actividad elegida.
+                          </p>
+                          <p>
+                            <strong>Cumplimiento de normas:</strong> Durante la actividad deberá seguir en todo momento las indicaciones del personal del parque y respetar las normas de seguridad.
+                          </p>
+                          <p>
+                            <strong>Uso de equipamiento:</strong> En las actividades que lo requieran (Tirolesa, Palestra), es obligatorio el uso del equipamiento y vestimenta provistos por el parque.
+                          </p>
+                          <p>
+                            <strong>Edad mínima:</strong> Cada actividad tiene una edad mínima establecida. El registro de una edad incorrecta podrá invalidar la inscripción.
+                          </p>
+                          <p>
+                            <strong>Cupos y horarios:</strong> Las inscripciones están sujetas a disponibilidad de cupos y se realizan hasta 2 días antes de la fecha elegida.
+                          </p>
+                          <p>
+                            <strong>Cancelaciones:</strong> El parque se reserva el derecho de cancelar o reprogramar actividades por condiciones climáticas o razones de seguridad.
+                          </p>
+                          <p>
+                            <strong>Aceptación:</strong> La participación en la actividad implica la aceptación total de estos términos y condiciones.
+                          </p>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button type="button">Cerrar</Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </>
                 )}
               </AccordionContent>
@@ -583,9 +779,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         </CardContent>
 
         <CardFooter className="flex flex-col">
-          {submitError && (
-             <p className="text-sm text-destructive w-full">{submitError}</p>
-          )}
           <Button type="submit" className="w-full mt-4" disabled={!isFormValid() || isSubmitting}>
             {isSubmitting ? "Reserving..." : "Reserve My Spot"}
           </Button>

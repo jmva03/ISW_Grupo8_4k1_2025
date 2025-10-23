@@ -1,8 +1,11 @@
+/* 1. IMPORTACIÓN DE FUENTE Y TAILWIND */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* 2. DEFINICIONES DE TEMA (Esto lo dejé como estaba) */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -41,80 +44,96 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* 3. PALETA DE COLORES - MODO CLARO (Aquí integré tu paleta) */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  
+  /* Paleta Verde - Modo Claro */
+  --background: oklch(1 0 0); /* Blanco */
+  --foreground: #134611;     /* eco-darkest */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #134611;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --popover-foreground: #134611;
+  --primary: #3e8914;         /* eco-dark */
+  --primary-foreground: #FFFFFF;
+  --secondary: #3da35d;     /* eco-medium */
+  --secondary-foreground: #FFFFFF;
+  --muted: #e8fccf;           /* eco-lightest */
+  --muted-foreground: #3e8914; /* eco-dark */
+  --accent: #e8fccf;           /* eco-lightest */
+  --accent-foreground: #134611; /* eco-darkest */
+  --border: #96e072;         /* eco-light */
+  --input: #96e072;           /* eco-light */
+  --ring: #3e8914;           /* eco-dark */
+  
+  /* Colores Sidebar - Modo Claro */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: #134611;
+  --sidebar-primary: #3e8914;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #e8fccf;
+  --sidebar-accent-foreground: #134611;
+  --sidebar-border: #96e072;
+  --sidebar-ring: #3e8914;
+
+  /* Colores que mantuve de tu archivo original */
+  --destructive: oklch(0.577 0.245 27.325); /* Rojo de error */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* 4. PALETA DE COLORES - MODO OSCURO (Aquí integré tu paleta) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Paleta Verde - Modo Oscuro */
+  --background: #134611;     /* eco-darkest */
+  --foreground: #e8fccf;     /* eco-lightest */
+  --card: #134611;
+  --card-foreground: #e8fccf;
+  --popover: #134611;
+  --popover-foreground: #e8fccf;
+  --primary: #96e072;         /* eco-light */
+  --primary-foreground: #134611; /* eco-darkest */
+  --secondary: #3da35d;     /* eco-medium */
+  --secondary-foreground: #e8fccf;
+  --muted: #3e8914;           /* eco-dark */
+  --muted-foreground: #e8fccf;
+  --accent: #3e8914;           /* eco-dark */
+  --accent-foreground: #e8fccf;
+  --border: #3e8914;           /* eco-dark */
+  --input: #3e8914;           /* eco-dark */
+  --ring: #96e072;           /* eco-light */
+
+  /* Colores Sidebar - Modo Oscuro */
+  --sidebar: #134611;
+  --sidebar-foreground: #e8fccf;
+  --sidebar-primary: #96e072;
+  --sidebar-primary-foreground: #134611;
+  --sidebar-accent: #3e8914;
+  --sidebar-accent-foreground: #e8fccf;
+  --sidebar-border: #3e8914;
+  --sidebar-ring: #96e072;
+
+  /* Colores que mantuve de tu archivo original */
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* 5. CAPA BASE (Aquí apliqué la fuente) */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    /* --- APLICACIÓN DE MONTSERRAT --- */
+    font-family: "Montserrat", system-ui, sans-serif;
   }
 }
