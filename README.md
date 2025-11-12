@@ -1,8 +1,8 @@
 # Grupo 8 ISW 4k1 2025
 
 <p align="center">
-  <img src="logo_utn.png" width="100">
-  
+  <img src="logo_utn.png" width="150">
+
   Repositorio para el grupo 8 de Ingeniería y Calidad de Software 4k1 del 2025.
 </p>
 
@@ -30,23 +30,23 @@
 
 ## Listado de ítems de configuración
 
-|  			Ítem de configuración 		                    |  			Regla de nombrado 		                                  |  			Ubicación física 		                                                                                     |   |   |
-|--------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------|---|---|
-|  			Trabajo Práctico Evaluable 		               |  			ISW_TP_&lt;nroTp&gt;.&lt;ext&gt; 		                               |  			ISW_Grupo8_4k1_2025/ISW_Trabajos-Prácticos/Evaluables/ISW_TP_&lt;nroTp&gt; 		                                 |   |   |
-|  			Trabajo Práctico No Evaluable 		            |  			ISW_TP_&lt;nroTp&gt;.&lt;ext&gt; 		                               |  			ISW_Grupo8_4k1_2025/ISW_Trabajos-Practicos/No_Evaluables/ISW_TP_&lt;nroTp&gt; 		                              |   |   |
-|  			Trabajo de Investigación 		                 |  			ISW_TPI_&lt;TipoDeInv&gt;.&lt;ext&gt; 		                          |  			ISW_Grupo8_4k1_2025/ISW_Trabajos-Investigacion/&lt;TipoDeInv&gt; 		                                           |   |   |
-|  			Presentación de clase 		                    |  			ISW_Clase_&lt;NroClase&gt;_&lt;Tema&gt;.pdf 		                    |  			ISW_Grupo8_4k1_2025/ISW_Clases/Presentaciones 		                                                        |   |   |
-|  			Clase Grabada 		                            |  			ISW_ClasesGrabadas.xlsx 		                            |  			ISW_Grupo8_4k1_2025/ISW_Clases/Clases_Grabadas 		                                                       |   |   |
-|  			Apuntes Tomados 		                          |  			ISW_Apunte_Semana&lt;NroSemana&gt;_&lt;TemaDeLaClase&gt;.&lt;ext&gt; 		 |  			ISW_Grupo8_4k1_2025/ISW_Clases/Apuntes 		                                                               |   |   |
-|  			Cronograma 		                               |  			ISW_Cronograma.xslx 		                                |  			ISW_Grupo8_4k1_2025/ISW_Material/Cronograma 		                                                          |   |   |
-|  			Criterio de línea Base 		                   |  			ISW_Criterio_Linea_Base.txt 		                        |  			ISW_Grupo8_4k1_2025/ISW_LineaBase 		                                                                    |   |   |
-|  			Documento de gestión de la configuración 		 |  			Documento_De_Gestión_De_Configuración.docx 		         |  			ISW_Grupo8_4k1_2025 		                                                                                  |   |   |
-|  			Programa de la Materia 		                   |  			ISW_Programa.pdf  			   			 		                              |  			ISW_Grupo8_4k1_2025/ISW_Material/Programa 		                                                            |   |   |
-|  			Bibliografía 		                             |  			&lt;Nombre_Bibliografía&gt;.pdf 		                          |  			ISW_Grupo8_4k1_2025/ISW_Material/Bibliografia 		                                                        |   |   |
-|  			Sprint Backlog 		                           |  			ISW_SPRINT_&lt;nro_Sprint&gt;_BACKLOG.docx 		               |  			ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt; 		                                   |   |   |
-|  			Métricas del Sprint 		                      |  			ISW_SPRINT_&lt;nro_Sprint&gt;_METRICAS.jpg 		               |  			ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt; 		                                   |   |   |
-|  			Resultado Sprint 		                         |  			ISW_SPRINT_&lt;nro_Sprint&gt;_&lt;Resultado&gt;.jpg 		            |  			ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt;/ISW_RESULTADO_SPRINT_&lt;nro_Sprint&gt; 		 |   |   |
-|  			Pieza de trabajo Kanban TP 12 		            |  			ISW_ITEM_KANBAN_&lt;Descripcion&gt;.jpeg 		                 |  			ISW_Trabajos-Prácticos/Evaluables/ISW_TP_12 		                                                          |   |   |
+|           Ítem de configuración          |                  Regla de nombrado                 |                                           Ubicación física                                           |
+|:----------------------------------------:|:--------------------------------------------------:|:----------------------------------------------------------------------------------------------------:|
+| Trabajo Práctico Evaluable               | ISW_TP_&lt;nroTp&gt;.&lt;ext&gt;                 | ISW_Grupo8_4k1_2025/ISW_Trabajos-Prácticos/Evaluables/ISW_TP_&lt;nroTp&gt;                             |
+| Trabajo Práctico No Evaluable            | ISW_TP_&lt;nroTp&gt;.&lt;ext&gt;                 | ISW_Grupo8_4k1_2025/ISW_Trabajos-Practicos/No_Evaluables/ISW_TP_&lt;nroTp&gt;                          |
+| Trabajo de Investigación                 | ISW_TPI_&lt;TipoDeInv&gt;.&lt;ext&gt;          | ISW_Grupo8_4k1_2025/ISW_Trabajos-Investigacion/&lt;TipoDeInv&gt;                                       |
+| Presentación de clase                    | ISW_Clase_&lt;NroClase&gt;_&lt;Tema&gt;.pdf     | ISW_Grupo8_4k1_2025/ISW_Clases/Presentaciones                                                        |
+| Clase Grabada                            | ISW_ClasesGrabadas.xlsx                            | ISW_Grupo8_4k1_2025/ISW_Clases/Clases_Grabadas                                                       |
+| Apuntes Tomados                          | ISW_Apunte_Semana&lt;NroSemana&gt;_&lt;TemaDeLaClase&gt;. &lt;ext&gt; | ISW_Grupo8_4k1_2025/ISW_Clases/Apuntes                                                               |
+| Cronograma                               | ISW_Cronograma.xslx                                | ISW_Grupo8_4k1_2025/ISW_Material/Cronograma                                                          |
+| Criterio de línea Base                   | ISW_Criterio_Linea_Base.txt                        | ISW_Grupo8_4k1_2025/ISW_LineaBase                                                                    |
+| Documento de gestión de la configuración | Documento_De_Gestión_De_Configuración.docx         | ISW_Grupo8_4k1_2025                                                                                  |
+| Programa de la Materia                   | ISW_Programa.pdf                                   | ISW_Grupo8_4k1_2025/ISW_Material/Programa                                                            |
+| Bibliografía                             | &lt;Nombre_Bibliografía&gt;.pdf                | ISW_Grupo8_4k1_2025/ISW_Material/Bibliografia                                                        |
+| Sprint Backlog                           | ISW_SPRINT_&lt;nro_Sprint&gt;_BACKLOG.docx     | ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt;                               |
+| Métricas del Sprint                      | ISW_SPRINT_&lt;nro_Sprint&gt;_METRICAS.jpg     | ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt;                               |
+| Resultado Sprint                         | ISW_SPRINT_&lt;nro_Sprint&gt;_&lt;Resultado&gt;.jpg | ISW_Trabajos-Prácticos/Evaluables/ISW_TP_7/ISW_SPRINT_&lt;nro_Sprint&gt;/ISW_RESULTADO_SPRINT_&lt;nro_Sprint&gt; |
+| Pieza de trabajo Kanban TP 12            | ISW_ITEM_KANBAN_&lt;Descripcion&gt;.jpeg       | ISW_Trabajos-Prácticos/Evaluables/ISW_TP_12                                                          |
 
 ## Convenciones de nomenclatura
 |  			Sigla 		                    |  			Significado 		                                                                                         |
